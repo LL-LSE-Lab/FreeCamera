@@ -20,9 +20,19 @@ bool Entry::load() { return true; }
 
 bool Entry::enable() {
     mConfig.emplace();
-    if (!ll::config::loadConfig(*mConfig, getSelf().getConfigDir() / u8"config.json")) {
-        ll::config::saveConfig(*mConfig, getSelf().getConfigDir() / u8"config.json");
+    auto const configPath = getSelf().getConfigDir() / u8"config.json";
+    try {
+        if (!ll::config::loadConfig(*mConfig, configPath)) {
+            ll::config::saveConfig(*mConfig, configPath);
+        }
+    } catch (std::exception const& e) {
+        // A config file that cannot be deserialized (e.g. hand edited, or written by a build with a
+        // field this one does not know) must not stop the mod from loading.
+        getSelf().getLogger().error("[{}] failed to load config, using defaults: {}", MOD_NAME, e.what());
+        mConfig.emplace();
+        ll::config::saveConfig(*mConfig, configPath);
     }
+    FreeCamera::reloadPacketOptions();
     mI18n.emplace(getSelf().getLangDir(), mConfig->language);
     mI18n->updateOrCreateLanguage("en_US", en_US);
     mI18n->updateOrCreateLanguage("zh_CN", zh_CN);
@@ -49,6 +59,30 @@ bool Entry::unload() {
 }
 
 Config& Entry::getConfig() { return mConfig.value(); }
+
+void reloadPacketOptions() {
+    auto& entry = Entry::getInstance();
+    auto& config = entry.getConfig();
+    try {
+        ll::config::loadConfig(config, entry.getSelf().getConfigDir() / u8"config.json");
+    } catch (std::exception const& e) {
+        entry.getSelf().getLogger().error("[{}] packet options reload failed: {}", MOD_NAME, e.what());
+    }
+    packetSerializationMode  = parseSerializationMode(config.packetSerializationMode);
+    sendGamemodeSwitch       = config.sendGamemodeSwitch;
+    sendFakePlayerListAdd    = config.sendFakePlayerListAdd;
+    sendFakePlayerListRemove = config.sendFakePlayerListRemove;
+    sendFakeAddPlayer        = config.sendFakeAddPlayer;
+    entry.getSelf().getLogger().debug(
+        "[{}] packet options: mode={} gamemodeSwitch={} playerListAdd={} playerListRemove={} addPlayer={}",
+        MOD_NAME,
+        config.packetSerializationMode,
+        sendGamemodeSwitch,
+        sendFakePlayerListAdd,
+        sendFakePlayerListRemove,
+        sendFakeAddPlayer
+    );
+}
 
 gmlib::i18n::LangI18n& Entry::getI18n() { return mI18n.value(); }
 

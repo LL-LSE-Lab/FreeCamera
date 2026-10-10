@@ -4,10 +4,11 @@
     "type": "native",
     "author": "GroupMountain",
     "description": "Free Camera",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "dependencies": [
         {
-            "name": "GMLIB"
+            "name": "GMLIB",
+            "version": ">=26.51.0"
         }
     ]
 }

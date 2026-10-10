@@ -1,6 +1,6 @@
 # FreeCamera  
 
-[![Minecraft - Version](https://img.shields.io/badge/minecraft-v1.26.10.x_(Bedrock)-black)](https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs)
+[![Minecraft - Version](https://img.shields.io/badge/minecraft-v1.26.51.x_(Bedrock)-black)](https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs)
 ![GitHub Tag](https://img.shields.io/github/v/tag/YUMU1658/FreeCamera)
 ![GitHub License](https://img.shields.io/github/license/GroupMountain/FreeCamera)
 
