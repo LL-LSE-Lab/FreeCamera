@@ -112,6 +112,28 @@ camera to the anchor, which has no chunk publisher: the world stops rendering (s
 client crashes a moment later. Hence the `*FC` suffix name, the cleared link / device / platform
 fields and the `SerializedAbilitiesData` rebuilt around the fake actor id.
 
+**This applies to the player list entry too, not only to `AddPlayerPacket`.** `AddEntry` copies
+every `PlayerListEntry` field, so the entry used to keep the real player's `mXUID` /
+`mPlatformOnlineId`. The client matches a player list entry to the identity it already knows, so
+the anchor then resolved to the *real* player's cached appearance instead of the entry's skin.
+That cache is never refreshed for the owning client (the server does not send a player its own skin
+update), which is why the anchor showed the skin from the moment the player logged in while
+everyone else saw the current one. `clearAnchorIdentity` (default `true`) clears those fields.
+`sendSelfSkinRefresh` additionally sends a `PlayerSkinPacket` for the real uuid to the player
+itself, and `sendFakePlayerSkin` re-applies the skin to the anchor entity after it is created, so
+the anchor does not depend on the client resolving anything at creation time.
+
+### `PlayerSkinPacket` is safe to build by hand, but do not touch `mSerializationMode`
+
+Unlike `PlayerListPacket` / `RemoveActorPacket`, `PlayerSkinPacket` declares a constructor, so the
+engine initialises `mSerializationMode` (the packet is serverbound and clientbound, the engine sends
+it itself). Assigning that member by hand is what breaks `SetPlayerGameTypePacket`, so leave it
+alone and only write the payload fields (`mUUID`, `mSkin`, `mLocalizedNewSkinName`,
+`mLocalizedOldSkinName`). Use empty localized names: a non empty name makes the client show a
+"changed skin" toast. With `skinDiagnostics` enabled the log prints the engine's own
+`getSerializationMode()` / `toString()` view of the packet, which is what to compare when a hand
+built packet is suspected of having a transposed layout.
+
 ### Config version bump
 
 `ll::config::loadConfig` only runs its merge-updater when the `version` stored in `config.json`
@@ -129,3 +151,14 @@ config fail to deserialize (`missing required field ...`) and the mod fails to e
 | `sendFakePlayerListAdd` | `true` | send the player list entry that carries the anchor's identity and skin |
 | `sendFakePlayerListRemove` | `true` | remove that entry again when leaving free camera |
 | `sendFakeAddPlayer` | `true` | send the anchor entity itself |
+| `clearAnchorIdentity` | `true` | clear the real player's `mXUID` / `mPlatformOnlineId` (and the host flags) out of the fake entry — see above |
+| `preferClientSkin` | `true` | build the anchor from the skin the client itself last uploaded instead of the server's cached copy |
+| `sendFakePlayerSkin` | `true` | send a `PlayerSkinPacket` for the anchor uuid after the entity is created |
+| `sendSelfSkinRefresh` | `true` | send a `PlayerSkinPacket` for the real uuid to the player itself (`/fc` entry and skin change) |
+| `refreshAnchorOnSkinChange` | `true` | push a new skin onto an existing anchor when the player changes skin in free camera |
+| `skinDiagnostics` | `false` | log the skin source, whether the candidates agree, and the engine's view of the `PlayerSkinPacket` we built |
+
+With `skinDiagnostics` enabled, `/fc` logs one `anchor skin: source=...` line (with
+`equalToList` / `equalToPlayer`, `identityCleared`, the skin ids and image size) and each skin
+change logs `skin change for <name>: playerSkinUpdated=...`. `source=client` means the skin used
+was the one the client uploaded; `equalToPlayer=false` means the server's own copy was stale.

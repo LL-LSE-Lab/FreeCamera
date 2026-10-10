@@ -31,6 +31,15 @@ extern bool sendFakePlayerListAdd;
 extern bool sendFakePlayerListRemove;
 extern bool sendFakeAddPlayer;
 
+/// See Config::clearAnchorIdentity / preferClientSkin / sendFakePlayerSkin / sendSelfSkinRefresh /
+/// refreshAnchorOnSkinChange / skinDiagnostics.
+extern bool clearAnchorIdentity;
+extern bool preferClientSkin;
+extern bool sendFakePlayerSkin;
+extern bool sendSelfSkinRefresh;
+extern bool refreshAnchorOnSkinChange;
+extern bool skinDiagnostics;
+
 /// Re-reads the packet switches from `config.json`. Called on every `/fc` so the switches can be
 /// changed without restarting the server.
 void reloadPacketOptions();

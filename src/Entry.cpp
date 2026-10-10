@@ -61,26 +61,40 @@ bool Entry::unload() {
 Config& Entry::getConfig() { return mConfig.value(); }
 
 void reloadPacketOptions() {
-    auto& entry = Entry::getInstance();
+    auto& entry  = Entry::getInstance();
     auto& config = entry.getConfig();
     try {
         ll::config::loadConfig(config, entry.getSelf().getConfigDir() / u8"config.json");
     } catch (std::exception const& e) {
         entry.getSelf().getLogger().error("[{}] packet options reload failed: {}", MOD_NAME, e.what());
     }
-    packetSerializationMode  = parseSerializationMode(config.packetSerializationMode);
-    sendGamemodeSwitch       = config.sendGamemodeSwitch;
-    sendFakePlayerListAdd    = config.sendFakePlayerListAdd;
-    sendFakePlayerListRemove = config.sendFakePlayerListRemove;
-    sendFakeAddPlayer        = config.sendFakeAddPlayer;
+    packetSerializationMode   = parseSerializationMode(config.packetSerializationMode);
+    sendGamemodeSwitch        = config.sendGamemodeSwitch;
+    sendFakePlayerListAdd     = config.sendFakePlayerListAdd;
+    sendFakePlayerListRemove  = config.sendFakePlayerListRemove;
+    sendFakeAddPlayer         = config.sendFakeAddPlayer;
+    clearAnchorIdentity       = config.clearAnchorIdentity;
+    preferClientSkin          = config.preferClientSkin;
+    sendFakePlayerSkin        = config.sendFakePlayerSkin;
+    sendSelfSkinRefresh       = config.sendSelfSkinRefresh;
+    refreshAnchorOnSkinChange = config.refreshAnchorOnSkinChange;
+    skinDiagnostics           = config.skinDiagnostics;
     entry.getSelf().getLogger().debug(
-        "[{}] packet options: mode={} gamemodeSwitch={} playerListAdd={} playerListRemove={} addPlayer={}",
+        "[{}] packet options: mode={} gamemodeSwitch={} playerListAdd={} playerListRemove={} addPlayer={} "
+        "clearAnchorIdentity={} preferClientSkin={} fakePlayerSkin={} selfSkinRefresh={} refreshOnSkinChange={} "
+        "skinDiagnostics={}",
         MOD_NAME,
         config.packetSerializationMode,
         sendGamemodeSwitch,
         sendFakePlayerListAdd,
         sendFakePlayerListRemove,
-        sendFakeAddPlayer
+        sendFakeAddPlayer,
+        clearAnchorIdentity,
+        preferClientSkin,
+        sendFakePlayerSkin,
+        sendSelfSkinRefresh,
+        refreshAnchorOnSkinChange,
+        skinDiagnostics
     );
 }
 
