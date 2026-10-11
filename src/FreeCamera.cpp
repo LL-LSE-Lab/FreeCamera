@@ -43,6 +43,7 @@ namespace FreeCamera {
 
 SerializationMode packetSerializationMode = SerializationMode::CerealOnly;
 
+bool normalLogging              = false;
 bool sendGamemodeSwitch        = true;
 bool sendFakePlayerListAdd     = true;
 bool sendFakePlayerListRemove  = true;
@@ -364,13 +365,15 @@ void refreshAnchorSkin(Player* pl, FreeCameraSession const& session, SerializedS
     if (sendFakePlayerSkin) {
         sendSkinPacket(pl, session.fakeUuid, skin);
     }
-    logger().info(
-        "[{}] anchor skin refreshed for {} fakeUuid={} fakeId={}",
-        MOD_NAME,
-        pl->getRealName(),
-        session.fakeUuid.asString(),
-        session.fakeUniqueId.rawID
-    );
+    if (normalLogging) {
+        logger().info(
+            "[{}] anchor skin refreshed for {} fakeUuid={} fakeId={}",
+            MOD_NAME,
+            pl->getRealName(),
+            session.fakeUuid.asString(),
+            session.fakeUniqueId.rawID
+        );
+    }
 }
 
 void removeFakeAnchorPackets(Player* pl, FreeCameraSession const& session) {
@@ -461,15 +464,17 @@ void SendFakePlayerPacket(Player* pl, FreeCameraSession const& session) {
         sendSkinPacket(pl, session.fakeUuid, *skin.skin);
     }
 
-    logger().info(
-        "[{}] anchor packet sent: uuid={} id={} name={} skinSource={} skinValid={}",
-        MOD_NAME,
-        session.fakeUuid.asString(),
-        session.fakeUniqueId.rawID,
-        fakeName,
-        skin.skin != nullptr ? skin.source : "default",
-        skin.skin != nullptr && skin.skin->isValid()
-    );
+    if (normalLogging) {
+        logger().info(
+            "[{}] anchor packet sent: uuid={} id={} name={} skinSource={} skinValid={}",
+            MOD_NAME,
+            session.fakeUuid.asString(),
+            session.fakeUniqueId.rawID,
+            fakeName,
+            skin.skin != nullptr ? skin.source : "default",
+            skin.skin != nullptr && skin.skin->isValid()
+        );
+    }
 }
 
 void DisableFreeCameraPacket(Player* pl, FreeCameraSession const& session) {
@@ -513,13 +518,15 @@ void onPlayerConnect(ll::event::PlayerConnectEvent& event) {
     // the old client is gone, and those packets can be interpreted as malformed join data.
     clearPlayerLifecycleState(pl);
     playersByConnection[event.networkIdentifier()] = uuid;
-    logger().info(
-        "[{}] connection bound: player={} uuid={} network={}",
-        MOD_NAME,
-        pl.getRealName(),
-        uuid.asString(),
-        networkLabel(event.networkIdentifier())
-    );
+    if (normalLogging) {
+        logger().info(
+            "[{}] connection bound: player={} uuid={} network={}",
+            MOD_NAME,
+            pl.getRealName(),
+            uuid.asString(),
+            networkLabel(event.networkIdentifier())
+        );
+    }
 }
 
 void onPlayerJoin(ll::event::PlayerJoinEvent& event) {
@@ -545,13 +552,15 @@ void onPlayerDisconnect(ll::event::PlayerDisconnectEvent& event) {
     auto&      pl   = event.self();
     auto const uuid = pl.getUuid();
     clearPlayerLifecycleState(pl);
-    logger().info(
-        "[{}] connection released: player={} uuid={} network={}",
-        MOD_NAME,
-        pl.getRealName(),
-        uuid.asString(),
-        networkLabel(pl.getNetworkIdentifier())
-    );
+    if (normalLogging) {
+        logger().info(
+            "[{}] connection released: player={} uuid={} network={}",
+            MOD_NAME,
+            pl.getRealName(),
+            uuid.asString(),
+            networkLabel(pl.getNetworkIdentifier())
+        );
+    }
 }
 
 } // namespace
@@ -584,15 +593,17 @@ void EnableFreeCamera(Player* pl) {
         EnableFreeCameraPacket(pl);
         SendFakePlayerPacket(pl, it->second);
         it->second.transition = false;
-        logger().info(
-            "[{}] free camera enabled for {} uuid={} network={} fakeUuid={} fakeId={}",
-            MOD_NAME,
-            pl->getRealName(),
-            session.playerUuid.asString(),
-            networkLabel(pl->getNetworkIdentifier()),
-            session.fakeUuid.asString(),
-            session.fakeUniqueId.rawID
-        );
+        if (normalLogging) {
+            logger().info(
+                "[{}] free camera enabled for {} uuid={} network={} fakeUuid={} fakeId={}",
+                MOD_NAME,
+                pl->getRealName(),
+                session.playerUuid.asString(),
+                networkLabel(pl->getNetworkIdentifier()),
+                session.fakeUuid.asString(),
+                session.fakeUniqueId.rawID
+            );
+        }
     } catch (...) {
         sessions.erase(session.playerUuid);
         throw;
@@ -616,15 +627,17 @@ void DisableFreeCamera(Player* pl) {
     auto dimid = pl->getDimensionId();
     DisableFreeCameraPacket(pl, session);
     pl->teleport(pos, dimid);
-    logger().info(
-        "[{}] free camera disabled for {} uuid={} network={} fakeUuid={} fakeId={}",
-        MOD_NAME,
-        pl->getRealName(),
-        session.playerUuid.asString(),
-        networkLabel(pl->getNetworkIdentifier()),
-        session.fakeUuid.asString(),
-        session.fakeUniqueId.rawID
-    );
+    if (normalLogging) {
+        logger().info(
+            "[{}] free camera disabled for {} uuid={} network={} fakeUuid={} fakeId={}",
+            MOD_NAME,
+            pl->getRealName(),
+            session.playerUuid.asString(),
+            networkLabel(pl->getNetworkIdentifier()),
+            session.fakeUuid.asString(),
+            session.fakeUniqueId.rawID
+        );
+    }
 }
 
 void DisableAllFreeCameras() {

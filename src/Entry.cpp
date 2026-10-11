@@ -62,6 +62,7 @@ void reloadPacketOptions() {
     } catch (std::exception const& e) {
         entry.getSelf().getLogger().error("[{}] packet options reload failed: {}", MOD_NAME, e.what());
     }
+    normalLogging             = config.normalLogging;
     packetSerializationMode   = parseSerializationMode(config.packetSerializationMode);
     sendGamemodeSwitch        = config.sendGamemodeSwitch;
     sendFakePlayerListAdd     = config.sendFakePlayerListAdd;
@@ -74,10 +75,11 @@ void reloadPacketOptions() {
     refreshAnchorOnSkinChange = config.refreshAnchorOnSkinChange;
     skinDiagnostics           = config.skinDiagnostics;
     entry.getSelf().getLogger().debug(
-        "[{}] packet options: mode={} gamemodeSwitch={} playerListAdd={} playerListRemove={} addPlayer={} "
+        "[{}] packet options: normalLogging={} mode={} gamemodeSwitch={} playerListAdd={} playerListRemove={} addPlayer={} "
         "clearAnchorIdentity={} preferClientSkin={} fakePlayerSkin={} selfSkinRefresh={} refreshOnSkinChange={} "
         "skinDiagnostics={}",
         MOD_NAME,
+        normalLogging,
         config.packetSerializationMode,
         sendGamemodeSwitch,
         sendFakePlayerListAdd,

@@ -139,6 +139,8 @@ built packet is suspected of having a transposed layout.
 `ll::config::loadConfig` only runs its merge-updater when the `version` stored in `config.json`
 differs from `Config::version`. Adding a field without bumping the version makes every existing
 config fail to deserialize (`missing required field ...`) and the mod fails to enable.
+The logging switch below raises the config version from 5 to 6; existing version 5 files are merged
+with the new default and keep their existing values.
 
 ## Runtime switches
 
@@ -146,6 +148,7 @@ config fail to deserialize (`missing required field ...`) and the mod fails to e
 
 | Key | Default | Meaning |
 |-----|---------|---------|
+| `normalLogging` | `false` | log routine connection, anchor and free-camera lifecycle information |
 | `packetSerializationMode` | `cerealOnly` | serialization mode for the packets the mod builds by hand (`cerealOnly` / `sideBySide` / `manualOnly`) |
 | `sendGamemodeSwitch` | `true` | send the spectator game mode switch |
 | `sendFakePlayerListAdd` | `true` | send the player list entry that carries the anchor's identity and skin |

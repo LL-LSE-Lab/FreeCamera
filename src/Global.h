@@ -21,6 +21,9 @@ namespace FreeCamera {
  */
 extern ::SerializationMode packetSerializationMode;
 
+/// See Config::normalLogging.
+extern bool normalLogging;
+
 /// See Config::sendGamemodeSwitch / sendFakePlayerListAdd / sendFakePlayerListRemove /
 /// sendFakeAddPlayer.
 extern bool sendGamemodeSwitch;

@@ -7,9 +7,13 @@ struct Config {
     /// Bump whenever a field is added: `ll::config::loadConfig` only runs its merge-updater when the
     /// version stored in `config.json` differs from this one, otherwise a config file written by an
     /// older build fails to deserialize (`missing required field ...`).
-    int version = 5;
+    int version = 6;
 
     std::string language = "zh_CN";
+
+    /// Log routine lifecycle information such as connection, anchor and free-camera transitions.
+    /// Errors, warnings and opt-in skin diagnostics are not controlled by this switch.
+    bool normalLogging = false;
 
     /// Serialization mode used for every packet this mod builds by hand.
     ///
