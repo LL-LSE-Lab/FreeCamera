@@ -5,8 +5,6 @@
 #include "ll/api/Versions.h"
 #include "ll/api/mod/NativeMod.h"
 #include "ll/api/mod/RegisterHelper.h"
-#include "ll/api/service/Bedrock.h"
-#include "mc/world/level/Level.h"
 #include "resource.h"
 
 namespace FreeCamera {
@@ -43,11 +41,7 @@ bool Entry::enable() {
 }
 
 bool Entry::disable() {
-    FreeCamList.clear();
-    ll::service::getLevel()->forEachPlayer([](Player& pl) -> bool {
-        FreeCamera::DisableFreeCamera(&pl);
-        return true;
-    });
+    FreeCamera::DisableAllFreeCameras();
     return true;
 }
 

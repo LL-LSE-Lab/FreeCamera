@@ -21,8 +21,7 @@ void RegisterCommand() {
             auto* entity = origin.getEntity();
             if (entity && entity->isPlayer()) {
                 auto* pl   = static_cast<Player*>(entity);
-                auto  guid = pl->getNetworkIdentifier().mGuid.g;
-                if (!FreeCamList.count(guid)) {
+                if (!FreeCamera::IsFreeCamera(*pl)) {
                     FreeCamera::EnableFreeCamera(pl);
                     return output.success("freecamera.command.enabled"_tr());
                 } else {

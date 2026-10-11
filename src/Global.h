@@ -2,11 +2,8 @@
 #include <mc/network/packet/cerealize/core/SerializationMode.h>
 #include <mc/world/actor/player/Player.h>
 #include <string>
-#include <unordered_set>
 
 #define MOD_NAME "FreeCamera"
-
-extern std::unordered_set<uint64> FreeCamList;
 
 extern void RegisterCommand();
 
@@ -48,7 +45,13 @@ void reloadPacketOptions();
 /// SerializationMode::CerealOnly.
 [[nodiscard]] ::SerializationMode parseSerializationMode(std::string const& name);
 
+/// Returns whether this player owns an active free-camera session.
+[[nodiscard]] bool IsFreeCamera(Player const& pl);
+
 extern void DisableFreeCamera(Player* pl);
 extern void EnableFreeCamera(Player* pl);
+/// Disables only the sessions that are currently active. Disconnecting players are removed from
+/// the session table without sending packets by the lifecycle listeners.
+void DisableAllFreeCameras();
 extern void freecameraHook(bool enable);
 } // namespace FreeCamera
